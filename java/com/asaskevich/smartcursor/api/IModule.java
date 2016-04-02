@@ -1,6 +1,5 @@
 package com.asaskevich.smartcursor.api;
-
-public interface IModule {
-	public String getModuleName();
-	public String getAuthor();
+public abstract interface IModule {
+   public abstract String getModuleName();
+   public abstract String getAuthor();
 }

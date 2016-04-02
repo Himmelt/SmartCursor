@@ -1,21 +1,16 @@
 package com.asaskevich.smartcursor.utils;
-
 import net.minecraft.item.ItemStack;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.registry.GameData;
-
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.GameData;
 public class ModIdentification {
-
-
-	@SuppressWarnings("deprecation")
-	public static String nameFromStack(ItemStack stack) {
-		try {
-			ModContainer mod = GameData.findModOwner(GameData.itemRegistry.getNameForObject(stack.getItem()));
-			String modname = mod == null ? "Minecraft" : mod.getName();
-			return modname;
-		} catch (NullPointerException e) {
-			return "";
-		}
-	}
-
+    public static String nameFromStack(ItemStack stack) {
+        try {
+            ResourceLocation location = GameData.getItemRegistry().getNameForObject(stack.getItem());
+            String mod = location.getResourceDomain();
+            return (mod == null) || (!Loader.isModLoaded(mod)) || (mod.equalsIgnoreCase("Minecraft")) ? "Minecraft" : mod;
+        } catch (NullPointerException e) {
+        }
+        return "";
+    }
 }

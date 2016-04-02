@@ -1,8 +1,7 @@
 package com.asaskevich.smartcursor.api;
-
 import java.util.List;
 import net.minecraft.item.ItemStack;
-
-public interface IDropProcessor extends IModule{
-	void process(List<String> list, ItemStack stack);
+public abstract interface IDropProcessor
+ extends IModule {
+   public abstract void process(List<String> paramList, ItemStack paramItemStack);
 }

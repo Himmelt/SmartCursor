@@ -1,27 +1,28 @@
 package com.asaskevich.smartcursor.modules.block;
-
+import com.asaskevich.smartcursor.api.IBlockProcessor;
 import java.util.List;
 import net.minecraft.block.Block;
-import net.minecraft.util.StatCollector;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
-import com.asaskevich.smartcursor.api.IBlockProcessor;
-
-public class BlockShearableModule
-		implements IBlockProcessor {
-	@Override
-	public String getModuleName() {
-		return "Is block shearable";
-	}
-
-	@Override
-	public String getAuthor() {
-		return "asaskevich";
-	}
-
-	@Override
-	public void process(List<String> list, Block block, int meta, World theWorld, int blockX, int blockY, int blockZ) {
-		if (block instanceof IShearable)
-			list.add(StatCollector.translateToLocal("smartcursor.block.shearable"));
-	}
+public class BlockShearableModule implements IBlockProcessor
+{
+  public String getModuleName()
+  {
+    return "Is block shearable";
+  }
+  public String getAuthor()
+  {
+    return "asaskevich";
+  }
+  public void process(List<String> list, Block block, IBlockState istate, BlockPos pos, World theWorld)
+  {
+    if ((block instanceof IShearable)) list.add(I18n.translateToLocal("smartcursor.block.shearable"));
+  }
 }
+/* Location:              C:\Users\pokem\Downloads\SmartCursor-1.5.0-MC1.8.jar!\com\asaskevich\smartcursor\modules\block\BlockShearableModule.class
+* Java compiler version: 6 (50.0)
+* JD-Core Version:       0.7.1
+*/

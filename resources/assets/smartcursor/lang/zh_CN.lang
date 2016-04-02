@@ -10,7 +10,6 @@ smartcursor.gui.showXPorbInfo=显示经验球信息:
 smartcursor.gui.showPlayerInfo=显示玩家信息:
 smartcursor.gui.showBlockInfo=显示方块信息:
 smartcursor.gui.advanced=高级
-
 # Advanced GUI
 smartcursor.gui.advancedTitle=高级 选项
 smartcursor.gui.showAdvancedInfoMobs=显示进阶生物信息:
@@ -27,7 +26,6 @@ smartcursor.gui.rightCorner=右上角
 smartcursor.gui.leftCorner=左上角
 smartcursor.gui.tooltipDelta=显示时间
 smartcursor.gui.displayTime=显示时间:
-
 # Module List
 smartcursor.gui.moduleList=载入的模块
 smartcursor.gui.loadedModules=所有载入的模块
@@ -35,7 +33,6 @@ smartcursor.gui.switch=启用/禁用
 smartcursor.gui.class=Class
 smartcursor.gui.name=描述
 smartcursor.gui.author=作者
-
 # Items
 smartcursor.item.enchBook=此附魔书拥有下列属性:
 smartcursor.item.healAmount=治愈等级: 
@@ -50,17 +47,14 @@ smartcursor.item.isDamaged=此物品已损坏!
 smartcursor.item.stackable=可堆叠
 smartcursor.item.in=至
 smartcursor.item.items=个
-
 # Blocks
 smartcursor.block.harvestBlock=你可以采掘这个方块
 smartcursor.block.cantHarvestBlock=你需要合适的工具来采掘这个方块
-
 # Players
 smartcursor.player.score=分数: 
 smartcursor.player.equipment=装备:
 smartcursor.player.team=队伍: 
 smartcursor.player.ench= [Ench]
-
 # Entity
 smartcursor.mob.tamedBy=驯服者
 smartcursor.mob.tamed=已被驯服!
@@ -86,7 +80,6 @@ smartcursor.mob.isAgressive=此生物具有攻击性!
 smartcursor.mob.isPassive=此生物无攻击性
 smartcursor.mob.child=孩子,会渐渐成长的~
 smartcursor.mob.seconds=秒
-
 # Styles, positions
 smartcursor.pos.inCorner=角落处
 smartcursor.pos.center=靠近准心
@@ -94,6 +87,5 @@ smartcursor.style.numeric=数值
 smartcursor.style.icons=图标
 smartcursor.style.progressBar=进度条
 smartcursor.style.percents=百分比
-
 #
 smartcursor.update.url=请在此处更新智能指针模组:
