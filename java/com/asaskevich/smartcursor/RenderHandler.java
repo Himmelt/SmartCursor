@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -26,6 +27,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -35,8 +37,10 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.common.IShearable;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -49,6 +53,7 @@ public class RenderHandler {
     private RenderPlayer renderPlayer;
     private RenderEntity renderEntity;
     private RenderItem itemRender;
+
     public RenderHandler(Minecraft mc) {
         this.mc = mc;
         width = mc.displayWidth;
@@ -67,10 +72,11 @@ public class RenderHandler {
             System.err.println(exception);
         }
     }
+
     @SubscribeEvent
     public void renderGameOverlay(RenderGameOverlayEvent event) throws IllegalAccessException {
         if (!Setting.isEnabled) return;
-       try {
+        try {
             itemRender = mc.getRenderItem();
             if (event.getType() == RenderGameOverlayEvent.ElementType.DEBUG) {
                 ScaledResolution res = new ScaledResolution(mc);
@@ -116,17 +122,26 @@ public class RenderHandler {
                         int x = 4;
                         int y = 4;
                         List<String> list = new ArrayList<String>();
-                        int meta = blockLookingAt.getMetaFromState(mc.theWorld.getBlockState(pos));
-            /*Item item = blockLookingAt.getItem(mc.theWorld, pos, mc.theWorld.getBlockState(pos));
-            ItemStack stack = new ItemStack(blockLookingAt);
-            if (item != null) stack = new ItemStack(blockLookingAt.func_180665_b(mc.theWorld, pos));
-            */
-                        //ItemStack stack = blockLookingAt.getItem(mc.theWorld, pos, mc.theWorld.getBlockState(pos));
-                        ItemStack stk = blockLookingAt.getItem(mc.theWorld, pos, mc.theWorld.getBlockState(pos));
-                        ItemStack stack = new ItemStack(blockLookingAt);
-                        if (stk != null) stack = blockLookingAt.getItem(mc.theWorld, pos, mc.theWorld.getBlockState(pos));
-                        stack.setItemDamage(meta);
+                        //int meta = blockLookingAt.getMetaFromState(mc.theWorld.getBlockState(pos));
+                        //Item item = blockLookingAt.getItemDropped(null, null, 0);
+                        //ItemStack stack = new ItemStack(blockLookingAt);
+                        //if (item != null) stack = new ItemStack(blockLookingAt.getItemDropped(null, null, 0));
+                        //Item item = blockLookingAt.getPickBlock(mc.theWorld.getBlockState(pos), null, mc.theWorld, pos, null).getItem();
+                        //ItemStack stack = new ItemStack(blockLookingAt);
+                        //if (item != null) stack = new ItemStack(item);
+                        //stack.setItemDamage(meta);
+                        ArrayList<ItemStack> items = getIdentiferItems(mc.theWorld, pos);
+                        int minDamage = Integer.MAX_VALUE;
+                        ItemStack stack = null;
+                        for (ItemStack astack : items) {
+                            if (astack.getItem() != null && astack.getItemDamage() < minDamage)
+                            {
+                                stack = astack;
+                                minDamage = stack.getItemDamage();
+                            }
+                        }
                         list.add(TextFormatting.BOLD + "" + TextFormatting.GOLD + stack.getDisplayName() + TextFormatting.RESET);
+                        list.add(TextFormatting.ITALIC + "" + TextFormatting.GRAY + stack.getItem().getRegistryName() + " : " + stack.getItemDamage() );
                         for (IBlockProcessor module : Modules.blockModules) {
                             if (Modules.isActiveModule(module.getClass().getCanonicalName()))
                                 module.process(list, blockLookingAt, mc.theWorld.getBlockState(pos), pos, mc.theWorld);
@@ -146,7 +161,7 @@ public class RenderHandler {
                         renderItem(stack, 0, x, y, 1.0F);
                         fontRender.drawStringWithShadow(list.get(0), x + 20, y + 4, color);
                         for (int i = 1; i < list.size(); i++) {
-                            fontRender.drawStringWithShadow( list.get(i), x, y + 8 + fontRender.FONT_HEIGHT * i, color);
+                            fontRender.drawStringWithShadow(list.get(i), x, y + 8 + fontRender.FONT_HEIGHT * i, color);
                         }
                     } else if (EntityPonter.pointedEntity != null) {
                         Entity target = EntityPonter.pointedEntity;
@@ -248,6 +263,36 @@ public class RenderHandler {
             e.printStackTrace(System.out);
         }
     }
+
+    // Based on NotEnoughItems Source Code
+    // https://github.com/Chicken-Bones/NotEnoughItems/blob/master/src/codechicken/nei/api/ItemInfo.java
+    public ArrayList<ItemStack> getIdentiferItems(World world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+
+        ItemStack pick = block.getPickBlock(state, null, world, pos, null);
+        if (pick != null)
+            items.add(pick);
+
+        try {
+            items.addAll(block.getDrops(world, pos, state, 0));
+        }
+        catch(Exception ignored) {}
+
+        if (block instanceof IShearable)
+        {
+            IShearable shearable = (IShearable)block;
+            if (shearable.isShearable(new ItemStack(Items.shears), world, pos))
+                items.addAll(shearable.onSheared(new ItemStack(Items.shears), world, pos, 0));
+
+            if (items.size() == 0)
+                items.add(0, new ItemStack(block, 1, block.getMetaFromState(state)));
+        }
+
+        return items;
+    }
+
     public void renderItem(ItemStack itemstack, int slot, int x, int y, float partialTick) {
         if (itemstack != null) {
             GL11.glEnable(32826);
@@ -261,19 +306,23 @@ public class RenderHandler {
             GL11.glDisable(3042);
         }
     }
+
     public void invertRender() {
         Setting.isEnabled = !Setting.isEnabled;
     }
+
     public String getStyleName() {
         if (Setting.blockDamageStyle == 0) return I18n.translateToLocal("smartcursor.style.percents");
         if (Setting.blockDamageStyle == 1) return I18n.translateToLocal("smartcursor.style.progressBar");
         if (Setting.blockDamageStyle == 2) return "OFF";
         return "";
     }
+
     public void setNextStyle() {
         Setting.blockDamageStyle += 1;
         Setting.blockDamageStyle %= 3;
     }
+
     public String getMobStyleName() {
         if (Setting.mobStyle == 0) return I18n.translateToLocal("smartcursor.style.numeric");
         if (Setting.mobStyle == 1) return I18n.translateToLocal("smartcursor.style.progressBar");
@@ -281,28 +330,35 @@ public class RenderHandler {
         if (Setting.mobStyle == 3) return "OFF";
         return "";
     }
+
     public void setMobNextStyle() {
         Setting.mobStyle += 1;
         Setting.mobStyle %= 4;
     }
+
     public void invertDropInfo() {
         Setting.showDropInformation = !Setting.showDropInformation;
     }
+
     public void invertEnchInfo() {
         Setting.showEnchantments = !Setting.showEnchantments;
     }
+
     public void invertDurInfo() {
         Setting.showDurability = !Setting.showDurability;
     }
+
     public String getDropStyleName() {
         if (Setting.dropStyle == 0) return I18n.translateToLocal("smartcursor.pos.center");
         if (Setting.dropStyle == 1) return I18n.translateToLocal("smartcursor.pos.inCorner");
         return "";
     }
+
     public void setDropNextStyle() {
         Setting.dropStyle += 1;
         Setting.dropStyle %= 2;
     }
+
     public String getPlayerStyleName() {
         if (Setting.playerStyle == 0) return I18n.translateToLocal("smartcursor.pos.inCorner");
         if (Setting.playerStyle == 1) return I18n.translateToLocal("smartcursor.style.numeric");
@@ -310,25 +366,32 @@ public class RenderHandler {
         if (Setting.playerStyle == 3) return I18n.translateToLocal("smartcursor.style.icons");
         return "";
     }
+
     public void setPlayerNextStyle() {
         Setting.playerStyle += 1;
         Setting.playerStyle %= 4;
     }
+
     public void invertXPInfo() {
         Setting.showXPOrb = !Setting.showXPOrb;
     }
+
     public void invertMobInfo() {
         Setting.displayAdvInfoMob = !Setting.displayAdvInfoMob;
     }
+
     public void invertBlockInfo() {
         Setting.showBlockInformation = !Setting.showBlockInformation;
     }
+
     public void invertPlayerInfo() {
         Setting.showPlayerInformation = !Setting.showPlayerInformation;
     }
+
     public void invertTooltipPlaceInfo() {
         Setting.showTooltipInRightCorner = !Setting.showTooltipInRightCorner;
     }
+
     @SubscribeEvent
     public void addTooltipText(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
