@@ -44,6 +44,7 @@ import net.minecraftforge.common.IShearable;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
+
 public class RenderHandler {
     public Minecraft mc;
     public int width;
