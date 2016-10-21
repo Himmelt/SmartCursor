@@ -4,7 +4,7 @@ SmartCursor
 Useful Minecraft mod with cursor utilities with own API.
 Full information on [mods.io](https://mods.io/mods/1089-smartcursor)
 
-**This is unofficial version contributed by Citringo.**
+**This is unofficial version contributed by Himmelt.**
 
 ### API Tutorial:
 #### Step 1. 

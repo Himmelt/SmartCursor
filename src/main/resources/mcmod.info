@@ -1,0 +1,18 @@
+{
+  "modid": "SmartCursor",
+  "name": "SmartCursor",
+  "description": "SmartCursor - easy solution to watch important information on your screen.",
+  "version": "1.5.1",
+  "mcversion": "1.8.9",
+  "url": "https://mods.io/mods/1089-smartcursor",
+  "updateUrl": "https://mods.io/mods/1089/download",
+  "authorList": [
+    "asaskevich",
+    "Himmelt"
+  ],
+  "parent": "",
+  "screenshots": [
+    "smart_cursor.png"
+  ],
+  "dependencies": []
+}
